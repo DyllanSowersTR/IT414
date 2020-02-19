@@ -15,7 +15,9 @@ namespace Game1
         // Therefore we use IMonsters
         //private List<Giant> aListOfMonsters = new List<Giant>();
         private List<IMonster> aListOfMonsters = new List<IMonster>();
-        private MonsterFactory aFactory = new MonsterFactory();
+        // private MonsterFactory aFactory = new MonsterFactory();
+
+        private int aLevel;
 
         public GameScene1()
         {
@@ -26,19 +28,26 @@ namespace Game1
             while (aPlayer.Weapon == null)
                 aPlayer.Weapon = Menu.SelectWeapon();
 
-            aListOfMonsters = aFactory.SpawnMonster(Menu.SelectLevel());
+            aLevel = Menu.SelectLevel();
+            EnemyFactory aFactory = new EnemyFactory(aLevel);
+            Zombie zombie = aFactory.SpawnZombie(aLevel);
+            int count = 1;
 
-            foreach (var m in aListOfMonsters)
-            {
-                //m.Attack(aPlayer);
-                while (m.Alive)
+            while (aFactory.ZombieCount() > 0)
+            {          
+                string mName = zombie.GetType().ToString() + count.ToString();
+                while (zombie.Alive)
                 {
-                    //Thread.Sleep(1000);
-                    Console.Write(m.GetType() + aListOfMonsters.IndexOf(m).ToString() + "     \n" + m.ToString() + "\n\n");
-                    m.Defend(aPlayer);
+                    Console.Write(mName + "     \n" + zombie.ToString() + "\n\n");
+                    zombie.Defend(aPlayer);
                 }
-                Console.WriteLine("You have killed " + m.GetType() + "! Nice job! \n\n");
+                // aFactory.ReclaimZombie(zombie);
+                Console.WriteLine("You have killed " + mName + "! Nice job! \n\n");
+                zombie = aFactory.SpawnZombie(aLevel);
+                count++;
             }
+
+            
             Console.WriteLine("All monsters are dead. Congrats!");
 
         }
